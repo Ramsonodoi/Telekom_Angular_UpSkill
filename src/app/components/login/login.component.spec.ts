@@ -28,8 +28,14 @@ describe('LoginComponent', () => {
   })
 
   it('should validate email format', () => {
-    expect(component.loginForm.get('email')?.value).toBe('')
-    expect(component.loginForm.get('password')?.value).toBe('')
+    const validEmail = 'michael.lawson@reqres.in'
+
+    component.loginForm.get('email')?.setValue(validEmail)
+    
+
+    expect(component.loginForm.get('email')?.value).toBe(validEmail)
+    expect(component.loginForm.get('email')?.valid).toBeTruthy()
+   
   })
 
   it ('should call login() method with correct credentials', () => {

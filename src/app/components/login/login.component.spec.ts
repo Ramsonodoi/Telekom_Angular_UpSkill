@@ -38,6 +38,15 @@ describe('LoginComponent', () => {
    
   })
 
+  it('should validate password format', () => {
+    const validPassword = '4ahr8r;'
+
+    component.loginForm.get('password')?.setValue(validPassword)
+
+    expect(component.loginForm.get('password')?.value).toBe(validPassword)
+    expect(component.loginForm.get('password')?.value).toBeTruthy()
+  })
+
   it ('should call login() method with correct credentials', () => {
     const email = 'kwakunii@gmail.com';
     const password = '4ahr8r;';

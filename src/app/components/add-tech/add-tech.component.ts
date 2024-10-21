@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './add-tech.component.html',
-  styleUrl: './add-tech.component.css'
+  styleUrl: './add-tech.component.scss'
 })
 export class AddTechComponent {
 

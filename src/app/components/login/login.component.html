@@ -1,13 +1,13 @@
-<div class="min-h-screen flex items-center justify-center bg-slate-800">
-    <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-md mt-10">
-      <h2 class="text-2xl font-bold mb-8 text-blue-900 text-center">Login Here</h2>
+<div class="main-container">
+    <div class="content-container">
+      <h2 class="login-here">Login Here</h2>
       <form [formGroup]="loginForm" (ngSubmit)="login()">
-          <div *ngIf="inlineNotification.show" class="text-red-600 mt-4 text-center">
+          <div *ngIf="inlineNotification.show" class="inline-notification">
             {{ inlineNotification.text }}
           </div>
-        <div class="mb-4">
-          <label for="email" class="block text-gray-700">Email</label>
-          <input type="email" id="email" formControlName="email" required class="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
+        <div class="email-container">
+          <label for="email" class="email-label">Email</label>
+          <input type="email" id="email" formControlName="email" required class="email-input">
           <div *ngIf="email.invalid && (email.dirty || email.touched)" class="text-red-600 mt-2">
             <div *ngIf="email.errors?.['required']">Email is required.</div>
             <div *ngIf="email.errors?.['email']">Invalid email format.</div>

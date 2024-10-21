@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.scss'
 })
 export class LoginComponent {
   email : FormControl<string | null> = new FormControl<string>('', [Validators.required, Validators.email]) 

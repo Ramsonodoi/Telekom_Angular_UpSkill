@@ -1,0 +1,6 @@
+@import '../../../styles.scss';
+
+.home-heading{
+    @include layout($text-align:center);
+    @include text-layout($weight: 700);
+}

@@ -10,7 +10,7 @@ import { ChangecolorDirective } from '../../shared/changecolor.directive';
   standalone: true,
   imports: [RouterLink, CommonModule, ChangecolorDirective],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  styleUrl: './navbar.component.scss'
 })
 
 

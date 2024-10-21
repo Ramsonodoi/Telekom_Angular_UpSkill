@@ -1,0 +1,50 @@
+@import '../../../styles.scss';
+
+.main-container{
+  @include set-height();
+  @include layout($display: flex, $align: center, $justify: center);
+  @include set-background-color($background-color: rgba(30, 41, 59, 1));
+}
+
+.content-container{
+  @include set-background-color();
+  @include padding-all(2rem);
+  @include set-border($border-radius: 1rem);
+  @include set-width();
+  @include set-max-width();
+  @include custom-margin(top, 2.5rem);
+  @include medium-shadow()
+}
+
+.login-here{
+  @include text-layout($size: 1.5rem, $weight: 700);
+  @include text-line-properties($lineHeight: 2rem);
+  @include custom-margin(bottom, 2rem);
+  @include set-color();
+  @include layout($text-align: center)
+}
+
+.inline-notification{
+  @include set-color($color: #dc2626);
+  @include custom-margin(top, 1rem);
+  @include layout($text-align: center);
+
+}
+
+.email-container{
+  @include custom-margin(bottom, 1rem);
+}
+
+.email-label{
+  @include layout($display: block);
+  @include set-color($color: #374151)
+}
+.email-input{
+  @include set-width();
+  @include custom-margin(left, 0.75rem);
+  @include custom-margin(right, 0.75rem);
+  @include custom-margin(top, 0.5rem);
+  @include custom-margin(bottom, 0.5rem);
+  @include set-border($border-radius: 0.25rem, $border-width: 1px, $border-color: #93c5fd);
+}
+

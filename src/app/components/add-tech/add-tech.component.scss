@@ -1,0 +1,8 @@
+@import '../../../styles.scss';
+
+.centered-text{
+    @include layout($text-align: center);
+    @include custom-margin(top, 4rem);
+    @include text-layout($weight: 700, $size: 1.5rem);
+    @include text-line-properties($lineHeight: 2rem);
+}

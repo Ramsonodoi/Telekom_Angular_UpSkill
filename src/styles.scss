@@ -1,0 +1,115 @@
+/* You can add global styles to this file, and also import other style files */
+@mixin set-width($width: 100%) {
+    width: $width;
+}
+
+@mixin set-max-width($maxWidth: 28rem)  {
+    max-width: $maxWidth;
+}
+
+@mixin set-height($height: 100vh) {
+    height: $height;
+}
+
+
+@mixin custom-padding($direction, $size){
+    padding-#{$direction}: $size
+}
+
+@mixin set-border(){
+
+}
+
+
+@mixin padding-all($size) {
+    @include custom-padding(top, $size);
+    @include custom-padding(right, $size);
+    @include custom-padding(bottom, $size);
+    @include custom-padding(left, $size);
+}
+
+@mixin custom-margin($direction, $size){
+    margin-#{$direction}: $size
+}
+
+@mixin margin($size) {
+    @include custom-margin(top, $size);
+    @include custom-margin(right, $size);
+    @include custom-margin(bottom, $size);
+    @include custom-margin(left, $size);
+}
+
+@mixin set-background-color($background-color: white){
+  background-color: $background-color;
+}
+
+@mixin set-border($border-radius: null, $border-width: null, $border-color: null){
+   @if $border-radius {
+    border-radius: $border-radius;
+   }
+
+   @if $border-width {
+    border-width: $border-width;
+   }
+
+   @if $border-color {
+    border-color: $border-color;
+   }
+}
+
+@mixin set-color($color:#1e3a8a  ){
+    color: $color;
+}
+
+
+@mixin layout($display: null, $align: null, $justify: null, $text-align: null){
+   @if $display {
+    display: $display;
+   }
+   @if $align {
+    align-items: $align;
+   }
+   @if $justify {
+    justify-content: $justify;
+   }
+   @if $text-align {
+    text-align: $text-align;
+   }
+}
+
+@mixin text-layout($size: null, $family:null, $weight: null, $style: null){
+    @if $size {
+        font-size: $size;
+    }
+
+    @if $family {
+        font-family: $family;
+    }
+
+    @if $weight {
+        font-weight: $weight;
+    }
+
+    @if $style {
+        font-style: $style;
+    }
+
+   
+}
+
+@mixin text-line-properties($lineHeight: null, $lineBreak:null, $lineClamp:null){
+  @if $lineHeight {
+    line-height: $lineHeight;
+  }
+  @if $lineBreak {
+    line-break: $lineBreak;
+  }
+  @if $lineClamp {
+    line-clamp: $lineClamp;
+  }
+}
+
+@mixin medium-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  }
+

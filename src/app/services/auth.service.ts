@@ -18,22 +18,23 @@ export class AuthService {
   constructor(private http: HttpClient) { }
 
   register(registerRequest: RegisterRequest): Observable<AuthResponse>{
-      return this.http.post<AuthResponse>(`${this.BASE_URL}/register`,registerRequest)    
+      return this.http.post<AuthResponse>(`${this.BASE_URL}/register`,registerRequest).pipe(
+        catchError(this.handleError)
+      )   
   }
 
   login(loginRequest: LoginRequest): Observable<AuthResponse>{
-     return this.http.post<AuthResponse>(`${this.BASE_URL}/login`, loginRequest).pipe(
-      tap((response: AuthResponse) => {
-        if (response &&( response.accessToken || response.token)) {
-          if (typeof window !== 'undefined' && window.sessionStorage){
-
-            sessionStorage.setItem('token', response.accessToken || response.token)
-          }
-        } 
-      }),
-      catchError(this.handleError)
-    )
-  }
+    return this.http.post<AuthResponse>(`${this.BASE_URL}/login`, loginRequest).pipe(
+     tap ((response: AuthResponse) => {
+       if (response &&( response.accessToken || response.token)) {
+         if (typeof window !== 'undefined' && window.sessionStorage){
+           sessionStorage.setItem('token', response.accessToken || response.token)
+         }
+       } 
+     }),
+     catchError(this.handleError)
+   )
+ }
 
   isAuthenticated(): boolean {
     if (typeof window !== 'undefined' && window.sessionStorage) {
@@ -57,21 +58,43 @@ export class AuthService {
   }
 
 
-  // isTokenExpired(token: string): boolean {
-  //   const decodedToken: any = jwtDecode(token)
-  //   return (decodedToken.exp * 1000) < Date.now()
-  // }
-
   private handleError(error: HttpErrorResponse) {
-    let errorMessage = 'An unknown error occurred';
+    let errorMessage: string;
+
     if (error.error instanceof ErrorEvent) {
-      // Client-side or network error
+    
       errorMessage = `Error: ${error.error.message}`;
     } else {
-      // Backend error
-      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    
+      switch (error.status) {
+        case 400:
+
+        errorMessage = `Bad Request: ${error.error?.message || error.message}`   
+          break;
+
+          case 401: 
+        errorMessage  = 'unathorized: You need to log in to access this resource';  
+          break;
+
+          case 500: 
+        errorMessage = 'Internal Server Error: Please try again later';
+          break;
+          
+          case 503:
+        errorMessage = 'Sevice Unavailable: The server is temporarily unable to handle the request';
+           break;    
+
+        default:
+          errorMessage = `Error Code: ${error.status}\nMessage: ${error.error?.message || error.message || 'Unknown error'}
+          }`
+      }
     }
-    console.error(errorMessage);
+
+    // log the error for debugging
+    console.error('Error Details: ', {
+      status: error.status,
+      message: errorMessage,
+    });
     return throwError(() => new Error(errorMessage));
   }
 }

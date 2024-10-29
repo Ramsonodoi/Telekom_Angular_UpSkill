@@ -47,7 +47,10 @@ export class RegisterComponent {
       },
       error: (err: any) => {
         console.log(err)
-      }
+      },
+      complete: () => {
+        console.log('Registration request completed')
+      },
     })
   }
 }

@@ -31,7 +31,8 @@ export class LoginComponent {
   }
 
   login() {
-     console.log(this.loginForm.value)
+     console.log( ' Login Form Values:',this.loginForm.value)
+
     if (this.loginForm.valid) {
       const loginRequest: LoginRequest = {
         email: this.loginForm.get('email')?.value,
@@ -39,9 +40,10 @@ export class LoginComponent {
        }
        this.authService.login(loginRequest).subscribe({
         next: (res: any) => {
-          console.log(res)
+          console.log('Login Success:' ,res)
           this.authService.setLoggedIn(true)
           this.router.navigate(['add-tech'])
+
         },
         error: (err: any) => {
           console.log(err)
@@ -51,6 +53,10 @@ export class LoginComponent {
             type: 'error',
             text: 'Login failed, please try again'
           }
+        }, 
+
+        complete: () => {
+          console.log('Login request completed')
         }
        })
     } else {

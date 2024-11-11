@@ -4,50 +4,53 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { LoginRequest } from '../login-request';
-import { Store } from '@ngrx/store';
-
-
-
+import { environment } from '../../environments/environment.development';
+import { HttpErrorMessage } from '../components/HttpErrorMessage.enum';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
+  public BASE_URL = `${environment.apiBaseUrl}`;
+  private loggedIn: WritableSignal<boolean> = signal<boolean>(
+    this.isAuthenticated()
+  );
 
-  public  BASE_URL: string = "https://reqres.in/api"
-  private loggedIn: WritableSignal<boolean> = signal<boolean>(this.isAuthenticated())
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient, private store: Store) { }
-
-  register(registerRequest: RegisterRequest): Observable<AuthResponse>{
-      return this.http.post<AuthResponse>(`${this.BASE_URL}/register`,registerRequest).pipe(
-        catchError(this.handleError)
-      )   
+  register(registerRequest: RegisterRequest): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${this.BASE_URL}/register`, registerRequest)
+      .pipe(catchError(this.handleError));
   }
 
-  login(loginRequest: LoginRequest): Observable<AuthResponse>{
+  login(loginRequest: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.BASE_URL}/login`, loginRequest);
- }
+  }
 
-
- handleLoginResponse(response$: Observable<AuthResponse>): Observable<AuthResponse> {
-  return response$.pipe(
+  handleLoginResponse(
+    response$: Observable<AuthResponse>
+  ): Observable<AuthResponse> {
+    return response$.pipe(
       tap((response: AuthResponse) => {
-          if (response && (response.accessToken || response.token)) {
-              if (typeof window !== 'undefined' && window.sessionStorage) {
-                  sessionStorage.setItem('token', response.accessToken || response.token);
-              }
+        if (response && (response.accessToken || response.token)) {
+          if (typeof window !== 'undefined' && window.sessionStorage) {
+            sessionStorage.setItem(
+              'token',
+              response.accessToken || response.token
+            );
           }
+        }
       }),
       catchError(this.handleError)
-  );
-}
+    );
+  }
 
   isAuthenticated(): boolean {
     if (typeof window !== 'undefined' && window.sessionStorage) {
       return !!sessionStorage.getItem('token');
     }
-    return false; 
+    return false;
   }
 
   logout(): void {
@@ -57,43 +60,44 @@ export class AuthService {
   }
 
   setLoggedIn(value: boolean) {
-    this.loggedIn.set(value)
+    this.loggedIn.set(value);
   }
 
   getLoggedIn(): WritableSignal<boolean> {
-    return this.loggedIn
+    return this.loggedIn;
   }
 
-
-   public handleError(error: HttpErrorResponse) {
+  public handleError(error: HttpErrorResponse) {
     let errorMessage: string;
 
     if (error.error instanceof ErrorEvent) {
-    
       errorMessage = `Error: ${error.error.message}`;
     } else {
-    
       switch (error.status) {
         case 400:
-
-        errorMessage = `Bad Request: ${error.error?.message || error.message}`   
+          errorMessage = `${HttpErrorMessage.BadRequest} ${
+            error.error?.message || error.message
+          }`;
           break;
 
-          case 401: 
-        errorMessage  = 'unathorized: You need to log in to access this resource';  
+        case 401:
+          errorMessage = HttpErrorMessage.Unauthorized;
           break;
 
-          case 500: 
-        errorMessage = 'Internal Server Error: Please try again later';
+        case 500:
+          errorMessage = HttpErrorMessage.InternalServerError;
           break;
-          
-          case 503:
-        errorMessage = 'Sevice Unavailable: The server is temporarily unable to handle the request';
-           break;    
+
+        case 503:
+          errorMessage = HttpErrorMessage.ServiceUnavailable;
+          break;
 
         default:
-          errorMessage = `Error Code: ${error.status}\nMessage: ${error.error?.message || error.message || 'Unknown error'}
-          }`
+          errorMessage = `Error Code: ${error.status}\nMessage: ${
+            error.error?.message ||
+            error.message ||
+            HttpErrorMessage.UnknownError
+          }`;
       }
     }
 

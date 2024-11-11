@@ -11,7 +11,6 @@ export class LoginEffects {
     login$ = createEffect(() => 
         this.actions$.pipe(
             ofType(loginPage),
-            tap(action => console.log('Action received', action)),
             switchMap(action => 
                 this.authService.handleLoginResponse( this.authService.login(action.loginRequest)).pipe(
                     map((response) => loginSuccess(response )),

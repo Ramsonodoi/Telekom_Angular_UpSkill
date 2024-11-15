@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { Store } from '@ngrx/store';
+import { loadStoredToken } from './components/store/actions/login.actions';
 
 @Component({
   selector: 'app-root',
@@ -9,6 +11,13 @@ import { NavbarComponent } from './components/navbar/navbar.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'angular-Interceptors';
+
+  constructor(private store: Store) {}
+
+  ngOnInit(): void {
+      this.store.dispatch(loadStoredToken())
+  }
+
 }

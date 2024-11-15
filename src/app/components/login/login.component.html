@@ -1,30 +1,66 @@
 <div class="main-container">
-    <div class="content-container">
-      <h2 class="login-here">Login Here</h2>
-      <form [formGroup]="loginForm" (ngSubmit)="login()">
-          <div *ngIf="inlineNotification.show" class="inline-notification">
-            {{ inlineNotification.text }}
+  <div class="content-container">
+    <h2 class="login-here">Login Here</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+      <div *ngIf="inlineNotification.show" class="inline-notification">
+        {{ inlineNotification.text }}
+      </div>
+      
+      <div class="email-container">
+        <label for="email" class="email-label">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email" 
+          required 
+          class="email-input"
+        >
+        <div 
+          *ngIf="loginForm.get('email')?.invalid && 
+                 (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)" 
+          class="text-red-600 mt-2"
+        >
+          <div *ngIf="loginForm.get('email')?.errors?.['required']">
+            Email is required.
           </div>
-        <div class="email-container">
-          <label for="email" class="email-label">Email</label>
-          <input type="email" id="email" formControlName="email" required class="email-input">
-          <div *ngIf="email.invalid && (email.dirty || email.touched)" class="text-red-600 mt-2">
-            <div *ngIf="email.errors?.['required']">Email is required.</div>
-            <div *ngIf="email.errors?.['email']">Invalid email format.</div>
+          <div *ngIf="loginForm.get('email')?.errors?.['email']">
+            Invalid email format.
           </div>
         </div>
-        <div class="mb-4">
-          <label for="password" class="block text-gray-700">Password</label>
-          <input type="password" id="password" formControlName="password" required class="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
-          <div *ngIf="password.invalid && (password.dirty || password.touched)" class="text-red-600 mt-2">
-            <div *ngIf="password.errors?.['required']">Password is required.</div>
-            <div *ngIf="password.errors?.['minlength']">Password must be at least 5 characters long.</div>
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="block text-gray-700">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password" 
+          required 
+          class="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+        >
+        <div 
+          *ngIf="loginForm.get('password')?.invalid && 
+                 (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)" 
+          class="text-red-600 mt-2"
+        >
+          <div *ngIf="loginForm.get('password')?.errors?.['required']">
+            Password is required.
+          </div>
+          <div *ngIf="loginForm.get('password')?.errors?.['minlength']">
+            Password must be at least 5 characters long.
           </div>
         </div>
-        <div class="flex justify-center">
-            <button type="submit" class="w-2/4 bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-700">Login</button>
-        </div>
-           
+      </div>
+
+      <div class="flex justify-center">
+        <button 
+          type="submit" 
+          [disabled]="loginForm.invalid"
+          class="w-2/4 bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Login
+        </button>
+      </div>
     </form>
-    </div>
+  </div>
 </div>

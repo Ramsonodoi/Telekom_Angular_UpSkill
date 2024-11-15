@@ -1,19 +1,14 @@
-import { AuthResponse } from './../../auth-response';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
-  FormBuilder,
 } from '@angular/forms';
 import { LoginRequest } from '../../login-request';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { selectToken } from '../store/selectors/login.selectors';
-import { loginPage } from '../store/actions/login.actions';
-import { filter, first } from 'rxjs';
+import { loginUser } from '../store/actions/login.actions';
 
 @Component({
   selector: 'app-login',
@@ -22,61 +17,45 @@ import { filter, first } from 'rxjs';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
-export class LoginComponent implements OnInit {
-  email: FormControl<string | null> = new FormControl<string>('', [
-    Validators.required,
-    Validators.email,
-  ]);
-  password: FormControl<string | null> = new FormControl<string>('', [
-    Validators.required,
-    Validators.minLength(5),
-  ]);
-
-  loginForm!: FormGroup;
+export class LoginComponent {
+  loginForm = new FormGroup({
+    email: new FormControl<string>('', {
+      validators: [Validators.required, Validators.email],
+      nonNullable: true,
+    }),
+    password: new FormControl<string>('', {
+      validators: [Validators.required, Validators.minLength(5)],
+      nonNullable: true,
+    }),
+  });
 
   inlineNotification: { show: boolean; type: string; text: string } = {
     show: false,
     type: '',
     text: '',
   };
-  constructor(
-    private FormBuilder: FormBuilder,
-    private router: Router,
-    private store: Store
-  ) {
-    this.loginForm = this.FormBuilder.group({
-      email: this.email,
-      password: this.password,
-    });
-  }
 
-  ngOnInit(): void {
-    this.store
-      .select(selectToken)
-      .pipe(
-        filter((token) => !!token),
-        first()
-      )
-      .subscribe((token) => {
-        if (token) {
-          this.router.navigateByUrl('add-tech');
-        }
-      });
-  }
+  constructor(private store: Store) {}
 
-  login() {
+  login(): void {
     if (this.loginForm.valid) {
       const loginRequest: LoginRequest = {
-        email: this.loginForm.get('email')?.value,
-        password: this.loginForm.get('password')?.value,
+        email: this.loginForm.value.email ?? '',
+        password: this.loginForm.value.password ?? '',
       };
-      this.store.dispatch(loginPage({ loginRequest }));
+
+      this.store.dispatch(loginUser({ loginRequest }));
     } else {
-      this.inlineNotification = {
-        show: true,
-        type: 'error',
-        text: 'Invalid Credentials!',
-      };
+      this.loginForm.markAllAsTouched();
+      this.showError('Please fill in all required fields correctly.');
     }
+  }
+
+  private showError(message: string): void {
+    this.inlineNotification = {
+      show: true,
+      type: 'error',
+      text: message,
+    };
   }
 }

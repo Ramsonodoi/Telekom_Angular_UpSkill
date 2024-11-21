@@ -1,0 +1,6 @@
+@import "../../../styles.scss";
+
+.validation-container {
+  @include set-color($color: #dc2626);
+  @include custom-margin(top, 0.5rem);
+}

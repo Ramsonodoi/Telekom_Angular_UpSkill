@@ -1,8 +1,7 @@
 import { RegisterRequest } from './../../register-request';
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
-  FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
@@ -11,49 +10,46 @@ import {
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { InlineNotificationService } from '../../services/inline-notification.service';
+import { InlineNotification } from '../../inlineNotification';
+import { ValidationMessagesComponent } from '../validation-messages/validation-messages.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, ValidationMessagesComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
-export class RegisterComponent {
-  toaster = inject(ToastrService);
+export class RegisterComponent implements OnInit {
+  inlineNotification: InlineNotification = { show: false, type: '', text: '' };
 
-  email: FormControl<string | null> = new FormControl<string>('', [
-    Validators.required,
-    Validators.email,
-  ]);
-  password: FormControl<string | null> = new FormControl<string>('', [
-    Validators.required,
-    Validators.minLength(5),
-  ]);
-
-  registerForm!: FormGroup;
-
-  inlineNotification: { show: boolean; type: string; text: string } = {
-    show: false,
-    type: '',
-    text: '',
-  };
-
-  constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
-    this.registerForm = this.formBuilder.group({
-      email: this.email,
-      password: this.password,
+  ngOnInit(): void {
+    this.notificationService.notification$.subscribe((notification) => {
+      if (notification) {
+        this.inlineNotification = notification;
+      }
     });
   }
+  registerForm = new FormGroup({
+    email: new FormControl<string>('', [Validators.required, Validators.email]),
+    password: new FormControl<string>('', [
+      Validators.required,
+      Validators.minLength(5),
+    ]),
+  });
+
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private toaster: ToastrService,
+    private notificationService: InlineNotificationService
+  ) {}
 
   register() {
     const registerRequest: RegisterRequest = {
-      email: this.registerForm.get('email')?.value,
-      password: this.registerForm.get('password')?.value,
+      email: this.registerForm.value.email ?? '',
+      password: this.registerForm.value.password ?? '',
     };
 
     this.authService.register(registerRequest).subscribe({
@@ -61,10 +57,14 @@ export class RegisterComponent {
         this.router.navigate(['login']);
       },
       error: () => {
-        this.toaster.error('Only defined users succeed registration', 'Error');
+        this.toaster.error('Only defined users succeed registration');
+        this.notificationService.showNotification(
+          'error',
+          'Use correct email from reqres to register'
+        );
       },
       complete: () => {
-        this.toaster.success('Registration request completed', 'Success');
+        this.toaster.success('Registration request completed');
       },
     });
   }

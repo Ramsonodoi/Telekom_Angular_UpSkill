@@ -1,6 +1,8 @@
+import { ToastrService } from 'ngx-toastr';
+
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, map, mergeMap, tap } from 'rxjs/operators';
+import { catchError, filter, map, mergeMap, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import {
   loginFailure,
@@ -22,6 +24,7 @@ export class LoginEffects {
   private actions$ = inject(Actions);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private toaster = inject (ToastrService);
 
   login$ = createEffect(() =>
     this.actions$.pipe(
@@ -48,6 +51,19 @@ export class LoginEffects {
       ),
     { dispatch: false }
   );
+
+  loginFailure$ = createEffect(
+    () => 
+      this.actions$.pipe(
+        ofType(loginFailure),
+        filter(({error }) => !!error.error?.error),
+        tap(({error})=> {
+         const errorMessage =    error.error?.error;
+          this.toaster.error(errorMessage)
+        })
+      ),
+      {dispatch: false }
+  )
 
   loadStoredToken$ = createEffect(() =>
     this.actions$.pipe(

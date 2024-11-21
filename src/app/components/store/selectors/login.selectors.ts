@@ -1,8 +1,14 @@
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { LoginState } from '../../../login-state';
 
-import { createFeatureSelector, createSelector } from "@ngrx/store";
-import { AuthResponse } from "../../../auth-response";
+const selectLogin = createFeatureSelector<LoginState>('login');
 
+export const selectToken = createSelector(
+  selectLogin,
+  (loginState: LoginState) => loginState.authResponse.token
+);
 
- const selectLogin = createFeatureSelector<AuthResponse>('login')
-
-export const selectToken = createSelector(selectLogin,(AuthResponse) => AuthResponse.token)
+export const selectLoginError = createSelector(
+  selectLogin,
+  (loginState: LoginState) => loginState.error
+);

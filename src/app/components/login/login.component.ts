@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -9,15 +9,28 @@ import {
 import { LoginRequest } from '../../login-request';
 import { Store } from '@ngrx/store';
 import { loginUser } from '../store/actions/login.actions';
+import { InlineNotificationService } from '../../services/inline-notification.service';
+import { InlineNotification } from '../../inlineNotification';
+import { ValidationMessagesComponent } from '../validation-messages/validation-messages.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, ValidationMessagesComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  inlineNotification: InlineNotification = { show: false, type: '', text: '' };
+
+  ngOnInit(): void {
+    this.notificationService.notification$.subscribe((notification) => {
+      if (notification) {
+        this.inlineNotification = notification;
+      }
+    });
+  }
+
   loginForm = new FormGroup({
     email: new FormControl<string>('', {
       validators: [Validators.required, Validators.email],
@@ -29,13 +42,10 @@ export class LoginComponent {
     }),
   });
 
-  inlineNotification: { show: boolean; type: string; text: string } = {
-    show: false,
-    type: '',
-    text: '',
-  };
-
-  constructor(private store: Store) {}
+  constructor(
+    private store: Store,
+    private notificationService: InlineNotificationService
+  ) {}
 
   login(): void {
     if (this.loginForm.valid) {
@@ -47,15 +57,10 @@ export class LoginComponent {
       this.store.dispatch(loginUser({ loginRequest }));
     } else {
       this.loginForm.markAllAsTouched();
-      this.showError('Please fill in all required fields correctly.');
+      this.notificationService.showNotification(
+        'error',
+        'Please fill in all required fields correctly.'
+      );
     }
-  }
-
-  private showError(message: string): void {
-    this.inlineNotification = {
-      show: true,
-      type: 'error',
-      text: message,
-    };
   }
 }

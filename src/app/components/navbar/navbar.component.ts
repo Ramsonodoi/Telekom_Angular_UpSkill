@@ -15,19 +15,14 @@ import { ChangecolorDirective } from '../../shared/changecolor.directive';
 
 
 export class NavbarComponent {
-  isLoggedIn: WritableSignal<boolean> = signal<boolean>(false)
 
   constructor(private authService: AuthService, private router: Router) {
 
   }
 
-  ngOnInit(): void {
-    this.isLoggedIn = this.authService.getLoggedIn()
-  }
 
   logout(){
      this.authService.logout()
-     this.authService.setLoggedIn(false)
      this.router.navigate(['login'])
   }
 }

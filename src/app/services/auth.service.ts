@@ -1,8 +1,8 @@
 import { AuthResponse } from './../auth-response';
 import { RegisterRequest } from './../register-request';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, signal, WritableSignal } from '@angular/core';
-import { catchError, Observable, tap, throwError } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { catchError, Observable,  throwError } from 'rxjs';
 import { LoginRequest } from '../login-request';
 import { environment } from '../../environments/environment.development';
 import { HttpErrorMessage } from '../components/HttpErrorMessage.enum';
@@ -12,9 +12,7 @@ import { HttpErrorMessage } from '../components/HttpErrorMessage.enum';
 })
 export class AuthService {
   public BASE_URL = `${environment.apiBaseUrl}`;
-  private loggedIn: WritableSignal<boolean> = signal<boolean>(
-    this.isAuthenticated()
-  );
+
 
   constructor(private http: HttpClient) {}
 
@@ -28,30 +26,8 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.BASE_URL}/login`, loginRequest);
   }
 
-  handleLoginResponse(
-    response$: Observable<AuthResponse>
-  ): Observable<AuthResponse> {
-    return response$.pipe(
-      tap((response: AuthResponse) => {
-        if (response && (response.accessToken || response.token)) {
-          if (typeof window !== 'undefined' && window.sessionStorage) {
-            sessionStorage.setItem(
-              'token',
-              response.accessToken || response.token
-            );
-          }
-        }
-      }),
-      catchError(this.handleError)
-    );
-  }
+ 
 
-  isAuthenticated(): boolean {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      return !!sessionStorage.getItem('token');
-    }
-    return false;
-  }
 
   logout(): void {
     if (typeof window !== 'undefined' && window.sessionStorage) {
@@ -59,13 +35,7 @@ export class AuthService {
     }
   }
 
-  setLoggedIn(value: boolean) {
-    this.loggedIn.set(value);
-  }
 
-  getLoggedIn(): WritableSignal<boolean> {
-    return this.loggedIn;
-  }
 
   public handleError(error: HttpErrorResponse) {
     let errorMessage: string;

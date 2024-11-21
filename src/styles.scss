@@ -114,3 +114,35 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   }
 
+
+  .inline-notification{
+    @include set-color($color: #dc2626);
+    @include custom-margin(top, 1rem);
+    @include layout($text-align: center);
+  }
+
+
+  .main-container{
+    @include set-height();
+    @include layout($display: flex, $align: center, $justify: center);
+    @include set-background-color($background-color: rgba(30, 41, 59, 1));
+  }
+  
+  .content-container{
+    @include set-background-color();
+    @include padding-all(2rem);
+    @include set-border($border-radius: 1rem);
+    @include set-width();
+    @include set-max-width();
+    @include custom-margin(top, 2.5rem);
+    @include medium-shadow()
+  }
+
+  .login-here{
+    @include text-layout($size: 1.5rem, $weight: 700);
+    @include text-line-properties($lineHeight: 2rem);
+    @include custom-margin(bottom, 2rem);
+    @include set-color();
+    @include layout($text-align: center)
+  }
+  

@@ -13,11 +13,13 @@ import { ToastrService } from 'ngx-toastr';
 import { InlineNotificationService } from '../../services/inline-notification.service';
 import { InlineNotification } from '../../inlineNotification';
 import { ValidationMessagesComponent } from '../validation-messages/validation-messages.component';
+import { CustomInputComponent } from '../custom-input/custom-input.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, ValidationMessagesComponent],
+  imports: [ReactiveFormsModule, CommonModule, ValidationMessagesComponent, CustomInputComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
@@ -31,6 +33,12 @@ export class RegisterComponent implements OnInit {
       }
     });
   }
+
+  ngOnDestroy(): void {
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe()
+    }
+  }
   registerForm = new FormGroup({
     email: new FormControl<string>('', [Validators.required, Validators.email]),
     password: new FormControl<string>('', [
@@ -43,7 +51,8 @@ export class RegisterComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private toaster: ToastrService,
-    private notificationService: InlineNotificationService
+    private notificationService: InlineNotificationService,
+    private notificationSubscription: Subscription
   ) {}
 
   register() {

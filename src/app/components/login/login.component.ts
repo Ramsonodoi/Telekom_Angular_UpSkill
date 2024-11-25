@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -12,23 +12,32 @@ import { loginUser } from '../store/actions/login.actions';
 import { InlineNotificationService } from '../../services/inline-notification.service';
 import { InlineNotification } from '../../inlineNotification';
 import { ValidationMessagesComponent } from '../validation-messages/validation-messages.component';
+import { CustomInputComponent } from "../custom-input/custom-input.component";
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, ValidationMessagesComponent],
+  imports: [ReactiveFormsModule, CommonModule, ValidationMessagesComponent, CustomInputComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
+
   inlineNotification: InlineNotification = { show: false, type: '', text: '' };
 
   ngOnInit(): void {
-    this.notificationService.notification$.subscribe((notification) => {
+   this.notificationSubscription = this.notificationService.notification$.subscribe((notification) => {
       if (notification) {
         this.inlineNotification = notification;
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe()
+    }
   }
 
   loginForm = new FormGroup({
@@ -44,7 +53,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private store: Store,
-    private notificationService: InlineNotificationService
+    private notificationService: InlineNotificationService,
+    private notificationSubscription: Subscription
   ) {}
 
   login(): void {

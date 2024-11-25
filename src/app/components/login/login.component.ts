@@ -14,6 +14,7 @@ import { InlineNotification } from '../../inlineNotification';
 import { ValidationMessagesComponent } from '../validation-messages/validation-messages.component';
 import { CustomInputComponent } from "../custom-input/custom-input.component";
 import { Subscription } from 'rxjs';
+import { FormHelperService } from '../../shared/form-helper.service';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,7 @@ import { Subscription } from 'rxjs';
   styleUrl: './login.component.scss',
 })
 export class LoginComponent implements OnInit, OnDestroy {
-
+  private notificationSubscription!: Subscription;
   inlineNotification: InlineNotification = { show: false, type: '', text: '' };
 
   ngOnInit(): void {
@@ -54,7 +55,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store,
     private notificationService: InlineNotificationService,
-    private notificationSubscription: Subscription
+    private formHelper: FormHelperService
+  
   ) {}
 
   login(): void {
@@ -72,5 +74,13 @@ export class LoginComponent implements OnInit, OnDestroy {
         'Please fill in all required fields correctly.'
       );
     }
+  }
+
+  getControlEmail(): FormControl {
+     return this.formHelper.getFormControl(this.loginForm, 'email') 
+  }
+
+  getControlPassword(): FormControl  {
+    return this.formHelper.getFormControl(this.loginForm, 'password') 
   }
 }

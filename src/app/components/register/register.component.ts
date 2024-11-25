@@ -15,6 +15,7 @@ import { InlineNotification } from '../../inlineNotification';
 import { ValidationMessagesComponent } from '../validation-messages/validation-messages.component';
 import { CustomInputComponent } from '../custom-input/custom-input.component';
 import { Subscription } from 'rxjs';
+import { FormHelperService } from '../../shared/form-helper.service';
 
 @Component({
   selector: 'app-register',
@@ -24,6 +25,7 @@ import { Subscription } from 'rxjs';
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent implements OnInit {
+  private notificationSubscription!: Subscription;
   inlineNotification: InlineNotification = { show: false, type: '', text: '' };
 
   ngOnInit(): void {
@@ -52,7 +54,8 @@ export class RegisterComponent implements OnInit {
     private router: Router,
     private toaster: ToastrService,
     private notificationService: InlineNotificationService,
-    private notificationSubscription: Subscription
+ 
+    private formHelper: FormHelperService
   ) {}
 
   register() {
@@ -77,4 +80,12 @@ export class RegisterComponent implements OnInit {
       },
     });
   }
+
+  getControlEmail(): FormControl {
+    return this.formHelper.getFormControl(this.registerForm, 'email') 
+ }
+
+ getControlPassword(): FormControl  {
+   return this.formHelper.getFormControl(this.registerForm, 'password') 
+ }
 }

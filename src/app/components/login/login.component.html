@@ -1,30 +1,58 @@
 <div class="main-container">
-    <div class="content-container">
-      <h2 class="login-here">Login Here</h2>
-      <form [formGroup]="loginForm" (ngSubmit)="login()">
-          <div *ngIf="inlineNotification.show" class="inline-notification">
-            {{ inlineNotification.text }}
-          </div>
-        <div class="email-container">
-          <label for="email" class="email-label">Email</label>
-          <input type="email" id="email" formControlName="email" required class="email-input">
-          <div *ngIf="email.invalid && (email.dirty || email.touched)" class="text-red-600 mt-2">
-            <div *ngIf="email.errors?.['required']">Email is required.</div>
-            <div *ngIf="email.errors?.['email']">Invalid email format.</div>
-          </div>
-        </div>
-        <div class="mb-4">
-          <label for="password" class="block text-gray-700">Password</label>
-          <input type="password" id="password" formControlName="password" required class="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
-          <div *ngIf="password.invalid && (password.dirty || password.touched)" class="text-red-600 mt-2">
-            <div *ngIf="password.errors?.['required']">Password is required.</div>
-            <div *ngIf="password.errors?.['minlength']">Password must be at least 5 characters long.</div>
-          </div>
-        </div>
-        <div class="flex justify-center">
-            <button type="submit" class="w-2/4 bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-700">Login</button>
-        </div>
-           
+  <div class="content-container">
+    <h2 class="login-here">Login Here</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+      @if (inlineNotification.show) {
+      <div class="inline-notification" [ngClass]="inlineNotification.type">
+        {{ inlineNotification.text }}
+      </div>
+      }
+
+      <div class="input-container">
+        <label for="email" class="input-label">Email</label>
+        <app-custom-input
+          placeholder="Enter Email"
+          type="email"
+          id="email"
+          [control]="getControlEmail()"
+          [required]="true"
+        ></app-custom-input>
+        <app-validation-messages
+          [control]="getControlEmail()"
+          [errorMap]="{
+            required: 'Email is required',
+            email: 'Invalid email format.'
+          }"
+        ></app-validation-messages>
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="input-label">Password</label>
+        <app-custom-input
+          placeholder="Enter Password"
+          type="password" 
+          id="password"
+          [control]="getControlPassword()"
+          [required]="true"
+        ></app-custom-input>
+        <app-validation-messages
+          [control]="getControlPassword()"
+          [errorMap]="{
+            required: 'Password is required',
+            minlength: 'Password must be at least 5 characters long.'
+          }"
+        ></app-validation-messages>
+      </div>
+
+      <div class="flex justify-center">
+        <button
+          type="submit"
+          [disabled]="loginForm.invalid"
+          class="w-2/4 bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Login
+        </button>
+      </div>
     </form>
-    </div>
+  </div>
 </div>

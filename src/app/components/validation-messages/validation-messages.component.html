@@ -1,0 +1,11 @@
+@if (isInvalid) {
+   <div class="validation-container">
+    @for (error of errorMessages; track $index) {
+       <div>
+        {{error}}
+    </div> 
+    }
+    
+</div> 
+}
+

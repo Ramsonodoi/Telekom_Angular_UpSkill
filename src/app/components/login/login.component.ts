@@ -1,64 +1,86 @@
-import { AuthService } from './../../services/auth.service';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { LoginRequest } from '../../login-request';
-import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { loginUser } from '../store/actions/login.actions';
+import { InlineNotificationService } from '../../services/inline-notification.service';
+import { InlineNotification } from '../../inlineNotification';
+import { ValidationMessagesComponent } from '../validation-messages/validation-messages.component';
+import { CustomInputComponent } from "../custom-input/custom-input.component";
+import { Subscription } from 'rxjs';
+import { FormHelperService } from '../../shared/form-helper.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, ValidationMessagesComponent, CustomInputComponent],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
 })
-export class LoginComponent {
-  email : FormControl<string | null> = new FormControl<string>('', [Validators.required, Validators.email]) 
-  password : FormControl<string | null> = new FormControl<string>('', [Validators.required, Validators.minLength(5)]) 
+export class LoginComponent implements OnInit, OnDestroy {
+  private notificationSubscription!: Subscription;
+  inlineNotification: InlineNotification = { show: false, type: '', text: '' };
+
+  ngOnInit(): void {
+   this.notificationSubscription = this.notificationService.notification$.subscribe((notification) => {
+      if (notification) {
+        this.inlineNotification = notification;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe()
+    }
+  }
+
+  loginForm = new FormGroup({
+    email: new FormControl<string>('', {
+      validators: [Validators.required, Validators.email],
+      nonNullable: true,
+    }),
+    password: new FormControl<string>('', {
+      validators: [Validators.required, Validators.minLength(5)],
+      nonNullable: true,
+    }),
+  });
+
+  constructor(
+    private store: Store,
+    private notificationService: InlineNotificationService,
+    private formHelper: FormHelperService
   
-  loginForm!: FormGroup;
+  ) {}
 
-  inlineNotification: {show: boolean; type: string; text: string} = {
-    show: false,
-    type: '',
-    text: ''
-  }
-  constructor(private FormBuilder: FormBuilder, private authService: AuthService, private router: Router) {
-     this.loginForm = this.FormBuilder.group({
-      email: this.email,
-      password: this.password
-     })
-  }
-
-  login() {
-     console.log(this.loginForm.value)
+  login(): void {
     if (this.loginForm.valid) {
       const loginRequest: LoginRequest = {
-        email: this.loginForm.get('email')?.value,
-        password: this.loginForm .get('password')?.value
-       }
-       this.authService.login(loginRequest).subscribe({
-        next: (res: any) => {
-          console.log(res)
-          this.authService.setLoggedIn(true)
-          this.router.navigate(['add-tech'])
-        },
-        error: (err: any) => {
-          console.log(err)
-          this.loginForm.reset()
-          this.inlineNotification = {
-            show: true,
-            type: 'error',
-            text: 'Login failed, please try again'
-          }
-        }
-       })
+        email: this.loginForm.value.email ?? '',
+        password: this.loginForm.value.password ?? '',
+      };
+
+      this.store.dispatch(loginUser({ loginRequest }));
     } else {
-      this.inlineNotification = {
-        show: true,
-        type: 'error',
-        text: 'Invalid Credentials!'
-      }
+      this.loginForm.markAllAsTouched();
+      this.notificationService.showNotification(
+        'error',
+        'Please fill in all required fields correctly.'
+      );
     }
+  }
+
+  getControlEmail(): FormControl {
+     return this.formHelper.getFormControl(this.loginForm, 'email') 
+  }
+
+  getControlPassword(): FormControl  {
+    return this.formHelper.getFormControl(this.loginForm, 'password') 
   }
 }

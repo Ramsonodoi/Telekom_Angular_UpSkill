@@ -1,53 +1,91 @@
 import { RegisterRequest } from './../../register-request';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms'
+import { Component, OnInit } from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { InlineNotificationService } from '../../services/inline-notification.service';
+import { InlineNotification } from '../../inlineNotification';
+import { ValidationMessagesComponent } from '../validation-messages/validation-messages.component';
+import { CustomInputComponent } from '../custom-input/custom-input.component';
+import { Subscription } from 'rxjs';
+import { FormHelperService } from '../../shared/form-helper.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, ValidationMessagesComponent, CustomInputComponent],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.scss'
+  styleUrl: './register.component.scss',
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
+  private notificationSubscription!: Subscription;
+  inlineNotification: InlineNotification = { show: false, type: '', text: '' };
 
-  email : FormControl<string | null> = new FormControl<string>('', [Validators.required, Validators.email]) 
-  password : FormControl<string | null> = new FormControl<string>('', [Validators.required, Validators.minLength(5)]) 
-  
-  registerForm!: FormGroup;
-
-  inlineNotification: {show: boolean; type: string; text: string} = {
-    show: false,
-    type: '',
-    text: ''
-  }
-
-  constructor(private formBuilder: FormBuilder, private authService: AuthService, private router: Router){
-    this.registerForm = this.formBuilder.group({
-      
-      email: this.email,
-      password: this.password
-    })  
-  }
-
-  register(){
-    console.log("Register", this.registerForm.value)
-    const registerRequest: RegisterRequest = {
-      email: this.registerForm.get('email')?.value,
-      password: this.registerForm.get('password')?.value
-    }
-
-    this.authService.register(registerRequest ).subscribe({
-      next: (res: any) => {
-        console.log(res)
-        this.router.navigate(['login'])
-      },
-      error: (err: any) => {
-        console.log(err)
+  ngOnInit(): void {
+    this.notificationService.notification$.subscribe((notification) => {
+      if (notification) {
+        this.inlineNotification = notification;
       }
-    })
+    });
   }
+
+  ngOnDestroy(): void {
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe()
+    }
+  }
+  registerForm = new FormGroup({
+    email: new FormControl<string>('', [Validators.required, Validators.email]),
+    password: new FormControl<string>('', [
+      Validators.required,
+      Validators.minLength(5),
+    ]),
+  });
+
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private toaster: ToastrService,
+    private notificationService: InlineNotificationService,
+ 
+    private formHelper: FormHelperService
+  ) {}
+
+  register() {
+    const registerRequest: RegisterRequest = {
+      email: this.registerForm.value.email ?? '',
+      password: this.registerForm.value.password ?? '',
+    };
+
+    this.authService.register(registerRequest).subscribe({
+      next: () => {
+        this.router.navigateByUrl('login');
+      },
+      error: () => {
+        this.toaster.error('Only defined users succeed registration');
+        this.notificationService.showNotification(
+          'error',
+          'Use correct email from reqres to register'
+        );
+      },
+      complete: () => {
+        this.toaster.success('Registration request completed');
+      },
+    });
+  }
+
+  getControlEmail(): FormControl {
+    return this.formHelper.getFormControl(this.registerForm, 'email') 
+ }
+
+ getControlPassword(): FormControl  {
+   return this.formHelper.getFormControl(this.registerForm, 'password') 
+ }
 }
